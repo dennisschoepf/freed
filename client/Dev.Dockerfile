@@ -1,14 +1,15 @@
-FROM denoland/deno:1.25.0
-
-ARG GIT_REVISION
-ENV PORT=${PORT}
-ENV DENO_DEPLOYMENT_ID=${GIT_REVISION}
+FROM node:16-alpine
 
 WORKDIR /app
 
+COPY package.json ./
+COPY package-lock.json ./
+
+RUN npm install
+
 COPY . .
-RUN deno cache main.ts --import-map=import_map.json
 
-EXPOSE ${PORT}
+EXPOSE 8091
 
-CMD ["run", "-A", "--watch=static/,routes/,islands/,components/", "main.ts"]
+CMD ["npm", "run", "dev"]
+

@@ -1,9 +1,8 @@
 services:
   client:
     container_name: client
-    image: deno
+    image: freed-client
     restart: unless-stopped
-    env_file: ./client/.env
     depends_on:
       - pocketbase
     build:
