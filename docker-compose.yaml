@@ -1,7 +1,18 @@
 services:
+  client:
+    container_name: client
+    image: deno
+    restart: unless-stopped
+    build:
+      context: ./client
+    networks:
+      - freed-network
+    ports:
+      - "8091:8000"
+
   pocketbase:
     container_name: pocketbase
-    build: 
+    build:
       context: .
       dockerfile: Pocketbase.Dockerfile
     image: pocketbase:latest
