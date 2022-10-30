@@ -3,6 +3,7 @@ services:
     container_name: client
     image: deno
     restart: unless-stopped
+    env_file: ./client/.env
     depends_on:
       - pocketbase
     build:
@@ -13,7 +14,7 @@ services:
     volumes:
       - ./client:/app
     ports:
-      - "8091:8000"
+      - "8091:8091"
 
   pocketbase:
     container_name: pocketbase
