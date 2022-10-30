@@ -1,0 +1,34 @@
+services:
+  client:
+    container_name: client
+    image: deno
+    restart: unless-stopped
+    depends_on:
+      - pocketbase
+    build:
+      context: ./client
+    networks:
+      - freed-network
+    ports:
+      - "8091:8000"
+
+  pocketbase:
+    container_name: pocketbase
+    build:
+      context: .
+      dockerfile: Pocketbase.Dockerfile
+    image: pocketbase:latest
+    volumes:
+      - pocketbase-volume:/app/pocketbase/pb_data
+    networks:
+      - freed-network
+    ports:
+      - "8090:8090"
+
+networks:
+  freed-network:
+    name: freed-network
+
+volumes:
+  pocketbase-volume:
+    name: pocketbase-volume
