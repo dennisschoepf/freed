@@ -3,5 +3,5 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("Init Web")
+	fmt.Println("Init freed application")
 }
