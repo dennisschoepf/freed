@@ -1,8 +1,9 @@
 package main
 
 import (
-	"freed/internal/api"
-	"freed/internal/database"
+	_ "embed"
+	"freed/api"
+	"freed/database"
 	"log"
 	"os"
 
@@ -18,7 +19,7 @@ func main() {
 		log.Fatalf("No ENV value set for 'DB_FILE', could not initialize database. Please provide a valid path and filename")
 	}
 
-	err := database.Connect(dbFile)
+	repository, err := database.NewRepository(dbFile)
 
 	if err != nil {
 		log.Fatalf("Could not initialize database: %v", err)
@@ -30,7 +31,7 @@ func main() {
 	app.Use(logger.New())
 
 	// Try to set up API routes
-	if err := api.Setup(app); err != nil {
+	if err := api.Setup(app, repository); err != nil {
 		log.Printf("Could not setup /api routes: %s", err)
 	}
 
