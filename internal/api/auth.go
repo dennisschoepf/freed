@@ -21,15 +21,17 @@ var (
 	}
 )
 
-func validateAPIKey(_ *fiber.Ctx, key string) (bool, error) {
-	hashedAPIKey := sha256.Sum256([]byte(apiKey))
-	hashedKey := sha256.Sum256([]byte(key))
+func apiKeyValidator(apiKey string) func(*fiber.Ctx, string) (bool, error) {
+	return func(_ *fiber.Ctx, key string) (bool, error) {
+		hashedAPIKey := sha256.Sum256([]byte(apiKey))
+		hashedKey := sha256.Sum256([]byte(key))
 
-	if subtle.ConstantTimeCompare(hashedAPIKey[:], hashedKey[:]) == 1 {
-		return true, nil
+		if subtle.ConstantTimeCompare(hashedAPIKey[:], hashedKey[:]) == 1 {
+			return true, nil
+		}
+
+		return false, keyauth.ErrMissingOrMalformedAPIKey
 	}
-
-	return false, keyauth.ErrMissingOrMalformedAPIKey
 }
 
 func protectedRoutesFilter(ctx *fiber.Ctx) bool {
