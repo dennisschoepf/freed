@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
@@ -15,19 +15,17 @@ func main() {
 		log.Fatalf("Could not initialize database: %v", err)
 	}
 
-	r := gin.Default()
-
-	// Middlewares
-	r.Use(gin.Recovery())
+	app := fiber.New()
 
 	// Routes
-	r.GET("/status", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
+	app.Get("/status", func(c *fiber.Ctx) error {
+		c.JSON(fiber.Map{
 			"application": "freed",
 			"version":     "0.0.1",
 			"status":      "up",
 		})
+		return c.SendStatus(http.StatusOK)
 	})
 
-	r.Run(":42069")
+	app.Listen(":42069")
 }
