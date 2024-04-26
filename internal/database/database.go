@@ -9,14 +9,16 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 )
 
+var DB *sqlx.DB
+
 //go:embed migrations/*
 var dbMigrations embed.FS
 
-func New(filename string) (*sqlx.DB, error) {
-	db, err := sqlx.Open("sqlite3", filename)
+func Connect(filename string) error {
+	DB, err := sqlx.Open("sqlite3", filename)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	migrations := migrate.EmbedFileSystemMigrationSource{
@@ -24,13 +26,13 @@ func New(filename string) (*sqlx.DB, error) {
 		Root:       "migrations",
 	}
 
-	n, err := migrate.Exec(db.DB, "sqlite3", migrations, migrate.Up)
+	n, err := migrate.Exec(DB.DB, "sqlite3", migrations, migrate.Up)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	fmt.Printf("Applied %d migrations - Database is ready!\n", n)
 
-	return db, err
+	return nil
 }

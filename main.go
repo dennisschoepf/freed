@@ -1,31 +1,36 @@
 package main
 
 import (
+	"freed/internal/api"
 	"freed/internal/database"
 	"log"
-	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+)
+
+var (
+	dbFile = "./freed.db"
 )
 
 func main() {
-	_, err := database.New("./freed.db")
+	err := database.Connect(dbFile)
 
 	if err != nil {
 		log.Fatalf("Could not initialize database: %v", err)
 	}
 
 	app := fiber.New()
-
-	// Routes
-	app.Get("/status", func(c *fiber.Ctx) error {
-		c.JSON(fiber.Map{
+	app.Use(logger.New())
+	app.Get("/", func(ctx *fiber.Ctx) error {
+		return ctx.JSON(&fiber.Map{
 			"application": "freed",
 			"version":     "0.0.1",
-			"status":      "up",
+			"status":      "running",
 		})
-		return c.SendStatus(http.StatusOK)
 	})
+
+	api.Setup(app)
 
 	app.Listen(":42069")
 }
