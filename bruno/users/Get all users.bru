@@ -4,12 +4,19 @@ meta {
   seq: 1
 }
 
-get {
+post {
   url: {{base_url}}/api/v1/users
-  body: none
+  body: json
   auth: none
 }
 
 headers {
   x-api-key: {{api_key}}
+}
+
+body:json {
+  {
+    "firstName": "Dennis",
+    "email": "me@dnsc.io"
+  }
 }
