@@ -1,5 +1,5 @@
 -- +migrate Up
-CREATE table users (
+CREATE table user (
   id INTEGER PRIMARY KEY,
   first_name text NOT NULL,
   email text NOT NULL
