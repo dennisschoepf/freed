@@ -24,9 +24,10 @@ func Setup(app *fiber.App, db *sql.DB) error {
 		Validator:      apiKeyValidator(apiKey),
 	}))
 
-	v1 := api.Group("/v1")
+	apiHandler := NewHandler(db)
 
-	v1.Get("/users", FetchAllUsersHandler)
+	v1 := api.Group("/v1")
+	v1.Post("/users", apiHandler.createUser)
 
 	return nil
 }
