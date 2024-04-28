@@ -1,7 +1,8 @@
 -- +migrate Up
 CREATE table users (
   id INTEGER PRIMARY KEY,
-  name text NOT NULL
+  first_name text NOT NULL,
+  email text NOT NULL
 );
 
 -- +migrate Down

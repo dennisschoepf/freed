@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"errors"
 	"os"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 )
 
-func Setup(app *fiber.App) error {
+func Setup(app *fiber.App, db *sql.DB) error {
 	apiKey := os.Getenv("API_KEY")
 
 	if apiKey == "" {

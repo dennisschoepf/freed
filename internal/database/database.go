@@ -1,24 +1,22 @@
 package database
 
 import (
+	"database/sql"
 	"embed"
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	migrate "github.com/rubenv/sql-migrate"
 )
 
-var DB *sqlx.DB
-
 //go:embed migrations/*
 var dbMigrations embed.FS
 
-func Connect(filename string) error {
-	DB, err := sqlx.Open("sqlite3", filename)
+func Connect(filename string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite3", filename)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	migrations := migrate.EmbedFileSystemMigrationSource{
@@ -26,13 +24,13 @@ func Connect(filename string) error {
 		Root:       "migrations",
 	}
 
-	n, err := migrate.Exec(DB.DB, "sqlite3", migrations, migrate.Up)
+	n, err := migrate.Exec(db, "sqlite3", migrations, migrate.Up)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	fmt.Printf("Applied %d migrations - Database is ready!\n", n)
 
-	return nil
+	return db, nil
 }
