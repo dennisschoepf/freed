@@ -24,12 +24,16 @@ func ValidateModel[T ModelConstraint](s T) *fiber.Error {
 	validate := validator.New()
 	err := validate.Struct(s)
 
-	if err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			err := fmt.Sprintf("Field %s is invalid, reason: %s", err.StructNamespace(), err.Tag())
+	fmt.Printf("%#v", err)
 
-			errorMessages = append(errorMessages, err)
-		}
+	if err == nil {
+		return nil
+	}
+
+	for _, err := range err.(validator.ValidationErrors) {
+		err := fmt.Sprintf("Field %s is invalid, reason: %s", err.StructNamespace(), err.Tag())
+
+		errorMessages = append(errorMessages, err)
 	}
 
 	return fiber.NewError(fiber.StatusBadRequest, strings.Join(errorMessages, ". "))
