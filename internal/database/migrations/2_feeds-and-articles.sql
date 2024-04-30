@@ -13,7 +13,7 @@ CREATE table article (
   url text NOT NULL,
   read INTEGER NOT NULL DEFAULT 0,
   readAt TIMESTAMP,
-  feed_id INTEGER NOT NULL,
+  feed_id INTEGER,
   FOREIGN KEY (feed_id) REFERENCES feed (id)
 );
 
