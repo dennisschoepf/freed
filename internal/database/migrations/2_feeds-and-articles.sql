@@ -1,5 +1,5 @@
 -- +migrate Up
-CREATE table feed (
+CREATE table IF NOT EXISTS feed (
   id text PRIMARY KEY,
   name text NOT NULL,
   url text NOT NULL,
@@ -7,7 +7,7 @@ CREATE table feed (
   FOREIGN KEY (user_id) REFERENCES user (id)
 );
 
-CREATE table article (
+CREATE table IF NOT EXISTS article (
   id text PRIMARY KEY,
   name text NOT NULL,
   url text NOT NULL,
