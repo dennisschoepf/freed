@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/google/uuid"
+	"github.com/mattn/go-sqlite3"
 )
 
 var defaultUserError = fiber.NewError(fiber.ErrInternalServerError.Code, "Could not create user")
@@ -35,8 +36,13 @@ func (h *Handler) createUser(c *fiber.Ctx) error {
 
 	_, insertErr := h.db.Exec("INSERT INTO user (id, first_name, email) VALUES (?, ?, ?)", user.ID, user.FirstName, user.Email)
 
-	if insertErr != nil {
+	if sqliteErr, ok := insertErr.(sqlite3.Error); ok {
 		log.Warn(insertErr)
+
+		if sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+			return fiber.NewError(fiber.StatusBadRequest, "User with email already exists")
+		}
+
 		return defaultUserError
 	}
 
