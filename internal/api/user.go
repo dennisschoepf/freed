@@ -27,6 +27,12 @@ func (h *Handler) createUser(c *fiber.Ctx) error {
 		return defaultUserError
 	}
 
+	validationErr := ValidateModel(user)
+
+	if validationErr != nil {
+		return validationErr
+	}
+
 	_, insertErr := h.db.Exec("INSERT INTO user (id, first_name, email) VALUES (?, ?, ?)", user.ID, user.FirstName, user.Email)
 
 	if insertErr != nil {
