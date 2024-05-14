@@ -6,4 +6,4 @@ CREATE table user (
 );
 
 -- +migrate Down
-DROP TABLE users;
+DROP TABLE user;
