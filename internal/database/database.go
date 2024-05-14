@@ -30,7 +30,7 @@ func Connect(filename string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	fmt.Printf("Applied %d migrations - Database is ready!\n", n)
+	fmt.Printf("Applied migrations - Database is ready!\n", n)
 
 	return db, nil
 }
