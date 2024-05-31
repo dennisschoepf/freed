@@ -24,7 +24,7 @@
 go.work
 
 # SQLite
-*.db
+*.db*
 
 .tmp/
 tmp
