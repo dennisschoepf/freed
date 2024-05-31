@@ -10,7 +10,7 @@ import (
 )
 
 type ModelConstraint interface {
-	*model.User // | add other models here
+	*model.User | *model.Feed
 }
 
 type ValidationError struct {
