@@ -1,6 +1,9 @@
 package api
 
 import (
+	"database/sql"
+	"errors"
+	"fmt"
 	"freed/internal/model"
 
 	"github.com/gofiber/fiber/v2"
@@ -31,7 +34,7 @@ func (h *Handler) createUser(c *fiber.Ctx) error {
 	validationErr := ValidateModel(user)
 
 	if validationErr != nil {
-		return validationErr
+		return fiber.NewError(fiber.ErrInternalServerError.Code, validationErr.Message)
 	}
 
 	_, insertErr := h.db.Exec("INSERT INTO user (id, first_name, email) VALUES (?, ?, ?)", user.ID, user.FirstName, user.Email)
@@ -48,4 +51,30 @@ func (h *Handler) createUser(c *fiber.Ctx) error {
 
 	c.SendStatus(201)
 	return c.JSON(&fiber.Map{"userId": userId})
+}
+
+func (h *Handler) getUserByID(id string) (*model.User, error) {
+	var user *model.User
+
+	if err := h.db.QueryRow("SELECT * FROM user WHERE id = ?", id).Scan(&user); err != nil {
+		if err == sql.ErrNoRows {
+			notFoundErrMessage := fmt.Sprintf("No user found with ID: %s", id)
+			return nil, errors.New(notFoundErrMessage)
+		}
+
+		unexpectedErrMessage := fmt.Sprintf("Unexpected error occured, could not get user with ID: %s", id)
+		return nil, errors.New(unexpectedErrMessage)
+	}
+
+	return user, nil
+}
+
+func (h *Handler) userExists(id string) bool {
+	var userID string
+
+	if err := h.db.QueryRow("SELECT id FROM user WHERE id = ?", id).Scan(&userID); err != nil {
+		return false
+	}
+
+	return true
 }
