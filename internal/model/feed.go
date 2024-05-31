@@ -11,6 +11,6 @@ type Feed struct {
 	ID     int64    `json:"id"`
 	Name   string   `json:"name"`
 	Url    string   `json:"url" validate:"required,url"`
-	UserID string   `json:"userId" validate:"required"`
+	UserID string   `json:"userId"`
 	Type   FeedType `json:"type"`
 }
