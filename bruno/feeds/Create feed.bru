@@ -1,0 +1,21 @@
+meta {
+  name: Create feed
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/v1/users/14515861-7ab1-442e-a1f8-7229ef849996/feeds
+  body: json
+  auth: none
+}
+
+headers {
+  x-api-key: {{api_key}}
+}
+
+body:json {
+  {
+    "url": "https://google.com"
+  }
+}
