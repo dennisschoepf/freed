@@ -13,7 +13,8 @@ import (
 var dbMigrations embed.FS
 
 func Connect(filename string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", filename)
+	dbOptions := "?_fk=on&_journal=WAL&sync=normal"
+	db, err := sql.Open("sqlite3", filename+dbOptions)
 
 	if err != nil {
 		return nil, err
@@ -24,13 +25,13 @@ func Connect(filename string) (*sql.DB, error) {
 		Root:       "migrations",
 	}
 
-	n, err := migrate.Exec(db, "sqlite3", migrations, migrate.Up)
+	_, migrateErr := migrate.Exec(db, "sqlite3", migrations, migrate.Up)
 
-	if err != nil {
+	if migrateErr != nil {
 		return nil, err
 	}
 
-	fmt.Printf("Applied migrations - Database is ready!\n", n)
+	fmt.Println("Applied migrations - Database is ready!")
 
 	return db, nil
 }

@@ -1,0 +1,5 @@
+local:
+    dialect: sqlite3
+    datasource: freed.db
+    dir: internal/database/migrations
+    table: gorp_migrations
