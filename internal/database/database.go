@@ -8,17 +8,15 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 )
 
-var db *sql.DB
-
 //go:embed migrations/*
 var dbMigrations embed.FS
 
-func Init(filename string) error {
+func Connect(path string) (*sql.DB, error) {
 	dbOptions := "?_fk=on&_journal=WAL&sync=normal"
-	db, err := sql.Open("sqlite3", filename+dbOptions)
+	db, err := sql.Open("sqlite3", path+dbOptions)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	migrations := migrate.EmbedFileSystemMigrationSource{
@@ -27,8 +25,12 @@ func Init(filename string) error {
 	}
 
 	if _, err := migrate.Exec(db, "sqlite3", migrations, migrate.Up); err != nil {
-		return err
+		return nil, err
 	}
 
-	return db.Ping()
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+
+	return db, nil
 }
