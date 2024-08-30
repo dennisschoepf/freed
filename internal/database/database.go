@@ -3,21 +3,22 @@ package database
 import (
 	"database/sql"
 	"embed"
-	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 	migrate "github.com/rubenv/sql-migrate"
 )
 
+var db *sql.DB
+
 //go:embed migrations/*
 var dbMigrations embed.FS
 
-func Connect(filename string) (*sql.DB, error) {
+func Init(filename string) error {
 	dbOptions := "?_fk=on&_journal=WAL&sync=normal"
 	db, err := sql.Open("sqlite3", filename+dbOptions)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	migrations := migrate.EmbedFileSystemMigrationSource{
@@ -25,13 +26,9 @@ func Connect(filename string) (*sql.DB, error) {
 		Root:       "migrations",
 	}
 
-	_, migrateErr := migrate.Exec(db, "sqlite3", migrations, migrate.Up)
-
-	if migrateErr != nil {
-		return nil, err
+	if _, err := migrate.Exec(db, "sqlite3", migrations, migrate.Up); err != nil {
+		return err
 	}
 
-	fmt.Println("Applied migrations - Database is ready!")
-
-	return db, nil
+	return db.Ping()
 }
