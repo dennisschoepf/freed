@@ -1,39 +1,23 @@
+/*
+Copyright © 2024 Dennis Schoepf <dev@dnsc.io>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 package main
 
-import (
-	_ "embed"
-	"freed/internal/api"
-	"freed/internal/database"
-	"log"
-	"os"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	_ "github.com/joho/godotenv/autoload"
-)
+import "freed/cmd"
 
 func main() {
-	dbFile := os.Getenv("DB_FILE")
-
-	if dbFile == "" {
-		log.Fatalf("No ENV value set for 'DB_FILE', could not initialize database. Please provide a valid path and filename")
-	}
-
-	db, err := database.Connect(dbFile)
-
-	if err != nil {
-		log.Fatalf("Could not initialize database: %v", err)
-	}
-
-	app := fiber.New()
-
-	// Global Middlewares
-	app.Use(logger.New())
-
-	// Try to set up API routes
-	if err := api.Setup(app, db); err != nil {
-		log.Printf("Could not setup /api routes: %s", err)
-	}
-
-	app.Listen(":42069")
+	cmd.Execute()
 }
