@@ -12,4 +12,14 @@ go install ...
 
 ## Usage
 
+...
+
+## Commands
+
+...
+
+## TODO
+
 - [ ] Document usage after commands are set up
+- [ ] Decide on and document installation process
+- [ ] Add command documentation to README
