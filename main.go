@@ -2,38 +2,27 @@ package main
 
 import (
 	_ "embed"
-	"freed/internal/api"
+	"fmt"
 	"freed/internal/database"
 	"log"
 	"os"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
-	dbFile := os.Getenv("DB_FILE")
+	dbFile := os.Getenv("DB_PATH")
 
 	if dbFile == "" {
-		log.Fatalf("No ENV value set for 'DB_FILE', could not initialize database. Please provide a valid path and filename")
+		log.Fatalf("No ENV value set for 'DB_PATH', could not initialize database. Please provide a valid path and filename")
 	}
 
-	db, err := database.Connect(dbFile)
+	_, err := database.Connect(dbFile)
 
 	if err != nil {
 		log.Fatalf("Could not initialize database: %v", err)
 	}
 
-	app := fiber.New()
-
-	// Global Middlewares
-	app.Use(logger.New())
-
-	// Try to set up API routes
-	if err := api.Setup(app, db); err != nil {
-		log.Printf("Could not setup /api routes: %s", err)
-	}
-
-	app.Listen(":42069")
+	fmt.Println("Setup finished")
+	os.Exit(1)
 }
