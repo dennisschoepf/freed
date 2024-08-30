@@ -17,7 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
+	"database/sql"
 	"fmt"
+	"freed/internal/database"
 	"os"
 	"path/filepath"
 
@@ -30,15 +32,21 @@ type DatabaseConfig struct {
 }
 
 type Config struct {
-	Db DatabaseConfig `mapstructure:"database"`
+	DB DatabaseConfig `mapstructure:"database"`
 }
 
-var cfgFile string
+type AppContext struct {
+	Config Config
+	DB     *sql.DB
+}
 
-var rootCmd = &cobra.Command{
-	Use:   "freed",
-	Short: "A f[r]eed aggregator with an intentionally reduced discovery mechanism.",
-	Long: `A f[r]eed aggregator with an intentionally reduced discovery mechanism.
+var (
+	appContext = &AppContext{}
+	cfgFile    string
+	rootCmd    = &cobra.Command{
+		Use:   "freed",
+		Short: "A f[r]eed aggregator with an intentionally reduced discovery mechanism.",
+		Long: `A f[r]eed aggregator with an intentionally reduced discovery mechanism.
 
 f[r]eed aims to handle all sort of different inputs that emit recurring content. This includes: RSS feeds, youtube channels, and more. If there is a type of input that you wish to be handled (or you find a bug), open an issue at https://github.com/dennisschoepf/freed/issues.
 
@@ -46,7 +54,22 @@ Where f[r]eed is different to other feed aggregators or bookmarking services is 
 
 The application also includes a set of recommended "Small Web" and topic-specific curated feeds. These are also available through the configuration.
 	`,
-}
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			db, err := database.Connect(appContext.Config.DB.Path)
+
+			if err != nil {
+				fmt.Printf("Could not connect to the database: %s", err)
+			}
+
+			appContext.DB = db
+		},
+		PersistentPostRun: func(cmd *cobra.Command, args []string) {
+			if appContext.DB != nil {
+				appContext.DB.Close()
+			}
+		},
+	}
+)
 
 func Execute() {
 	err := rootCmd.Execute()
@@ -58,11 +81,9 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// rootCmd.SetHelpFunc(internal.HelpFunc)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: ~/.config/freed/config.toml)")
 }
 
-// initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
@@ -87,9 +108,9 @@ func initConfig() {
 		os.Exit(1)
 	}
 
-	var c Config
+	viper.SetDefault("database.path", "freed.sqlite3")
 
-	if err := viper.Unmarshal(&c); err != nil {
+	if err := viper.Unmarshal(&appContext.Config); err != nil {
 		fmt.Printf("Could not read config file: %s", err)
 		os.Exit(1)
 	}

@@ -22,18 +22,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type Feed struct {
+	ID  int
+	URL string
+}
+
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Args:  cobra.MinimumNArgs(1),
+	Short: "Adds a new feed to the application.",
+	Long: `Validates and stores a feed in the application's database. Depending on the feed type, articles, videos, or updates are fetched right away.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Supported types currently are:
+- RSS
+- Youtube Channel links`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("add called")
+		fmt.Println("Not implemented. Feed will be added here")
 	},
 }
 
