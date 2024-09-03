@@ -65,6 +65,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig, initDB)
+
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: ~/.config/freed/config.toml)")
 }
 
@@ -101,8 +102,9 @@ func initConfig() {
 }
 
 func initDB() {
-	if err := database.Open(appContext.Config.DB.Path); err != nil {
-		fmt.Printf("Could not connect to database: %s", err)
-		os.Exit(1)
+	err := database.Open(appContext.Config.DB.Path)
+
+	if err != nil {
+		fmt.Printf("Could not connect to the database: %s", err)
 	}
 }
