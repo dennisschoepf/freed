@@ -15,12 +15,12 @@ func Add(feedUrl string) error {
 
 	feed, err := parseByUrl(feedUrl)
 
-	// TODO: I have everything here (feed), might as well store it right away
-	// Add an article table that stores the feed data that is parsed here
-
 	if err != nil {
 		return err
 	}
+
+	// TODO: I have everything here (feed), might as well store it right away
+	// Add an article table that stores the feed data that is parsed here
 
 	f := database.Feed{
 		Name: feed.Title,
