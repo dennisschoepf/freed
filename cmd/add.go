@@ -17,20 +17,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
-	"fmt"
+	feed "freed/internal"
 
 	"github.com/spf13/cobra"
 )
 
-type Feed struct {
-	ID  int
-	URL string
-}
-
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Args:  cobra.MinimumNArgs(1),
+	Args:  cobra.ExactArgs(1),
 	Short: "Adds a new feed to the application.",
 	Long: `Validates and stores a feed in the application's database. Depending on the feed type, articles, videos, or updates are fetched right away.
 
@@ -38,7 +33,7 @@ Supported types currently are:
 - RSS
 - Youtube Channel links`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Not implemented. Feed will be added here")
+		feed.Add(args[0])
 	},
 }
 
