@@ -1,14 +1,27 @@
 package feed
 
 import (
+	"fmt"
 	"freed/internal/database"
+	"net/url"
+
+	"github.com/mmcdole/gofeed"
 )
 
-func Add(url string) error {
+func Add(feedUrl string) error {
+	if _, err := url.ParseRequestURI(feedUrl); err != nil {
+		return fmt.Errorf("The given URL does not seem to be valid: %s", err)
+	}
+
+	feed, err := parseByUrl(feedUrl)
+
+	if err != nil {
+		return err
+	}
+
 	f := database.Feed{
-		Name:     url,
-		Url:      url,
-		FeedType: database.FeedType("RSS"),
+		Name: feed.Title,
+		Url:  feedUrl,
 	}
 
 	if _, err := f.Insert(); err != nil {
@@ -16,4 +29,15 @@ func Add(url string) error {
 	}
 
 	return nil
+}
+
+func parseByUrl(u string) (*gofeed.Feed, error) {
+	fp := gofeed.NewParser()
+	feed, err := fp.ParseURL(u)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return feed, nil
 }
