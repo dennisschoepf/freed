@@ -54,32 +54,19 @@ Where f[r]eed is different to other feed aggregators or bookmarking services is 
 
 The application also includes a set of recommended "Small Web" and topic-specific curated feeds. These are also available through the configuration.
 	`,
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			db, err := database.Connect(appContext.Config.DB.Path)
-
-			if err != nil {
-				fmt.Printf("Could not connect to the database: %s", err)
-			}
-
-			appContext.DB = db
-		},
-		PersistentPostRun: func(cmd *cobra.Command, args []string) {
-			if appContext.DB != nil {
-				appContext.DB.Close()
-			}
-		},
 	}
 )
 
 func Execute() {
 	err := rootCmd.Execute()
+
 	if err != nil {
 		os.Exit(1)
 	}
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig, initDB)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: ~/.config/freed/config.toml)")
 }
@@ -114,4 +101,14 @@ func initConfig() {
 		fmt.Printf("Could not read config file: %s", err)
 		os.Exit(1)
 	}
+}
+
+func initDB() {
+	db, err := database.Connect(appContext.Config.DB.Path)
+
+	if err != nil {
+		fmt.Printf("Could not connect to the database: %s", err)
+	}
+
+	appContext.DB = db
 }
