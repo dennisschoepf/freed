@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
-	"database/sql"
 	"fmt"
 	"freed/internal/database"
 	"os"
@@ -37,7 +36,6 @@ type Config struct {
 
 type AppContext struct {
 	Config Config
-	DB     *sql.DB
 }
 
 var (
@@ -67,7 +65,6 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig, initDB)
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: ~/.config/freed/config.toml)")
 }
 
@@ -104,11 +101,8 @@ func initConfig() {
 }
 
 func initDB() {
-	db, err := database.Connect(appContext.Config.DB.Path)
-
-	if err != nil {
-		fmt.Printf("Could not connect to the database: %s", err)
+	if err := database.Open(appContext.Config.DB.Path); err != nil {
+		fmt.Printf("Could not connect to database: %s", err)
+		os.Exit(1)
 	}
-
-	appContext.DB = db
 }
