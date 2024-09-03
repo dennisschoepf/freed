@@ -3,7 +3,7 @@ CREATE table feed (
   id INTEGER PRIMARY KEY,
   name text NOT NULL,
   url text NOT NULL UNIQUE,
-  type text NOT NULL
+  addedAt DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 -- +migrate Down
