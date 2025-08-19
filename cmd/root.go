@@ -52,6 +52,9 @@ Where f[r]eed is different to other feed aggregators or bookmarking services is 
 
 The application also includes a set of recommended "Small Web" and topic-specific curated feeds. These are also available through the configuration.
 	`,
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			initDB()
+		},
 	}
 )
 
@@ -64,7 +67,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig, initDB)
+	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: ~/.config/freed/config.toml)")
 }
@@ -93,7 +96,7 @@ func initConfig() {
 		os.Exit(1)
 	}
 
-	viper.SetDefault("database.path", "freed.sqlite3")
+	viper.SetDefault("database.path", "freed.db")
 
 	if err := viper.Unmarshal(&appContext.Config); err != nil {
 		fmt.Printf("Could not read config file: %s", err)
