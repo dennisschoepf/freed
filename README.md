@@ -1,6 +1,6 @@
 # freed
 
-A unique feed aggregator and bookmarking service that tries to free you from too much content. Currently only a CLI program, but I plan to add a web server and frontend in the future. In active development.
+A unique feed aggregator that tries to free you from consuming too much content.
 
 ## Installation
 
