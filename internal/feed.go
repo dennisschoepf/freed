@@ -19,8 +19,10 @@ func Add(feedUrl string) error {
 		return err
 	}
 
+	fmt.Printf("feed: %+v", feed)
+
 	// TODO: I have everything here (feed), might as well store it right away
-	// Add an article table that stores the feed data that is parsed here
+	// So, implement a loop to do that here
 
 	f := database.Feed{
 		Name: feed.Title,
