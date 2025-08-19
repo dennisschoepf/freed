@@ -17,7 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
+	"fmt"
 	feed "freed/internal"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -33,20 +35,14 @@ Supported types currently are:
 - RSS
 - Youtube Channel links`,
 	Run: func(cmd *cobra.Command, args []string) {
-		feed.Add(args[0])
+		if err := feed.Add(args[0]); err != nil {
+			// TODO: Prettify this/all errors
+			fmt.Printf("Error adding feed: %v\n", err)
+			os.Exit(1)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(addCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// addCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
