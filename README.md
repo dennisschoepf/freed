@@ -12,14 +12,26 @@ go install ...
 
 ## Usage
 
-...
+### Add a RSS feed or youtube channel
 
-## Commands
+```sh
+freed add
+```
 
-...
+### List all feeds
 
-## TODO
+```sh
+freed ls
+```
 
-- [ ] Document usage after commands are set up
-- [ ] Decide on and document installation process
-- [ ] Add command documentation to README
+### Show a feed entry for the day
+
+```sh
+freed today
+```
+
+### Sync the added feeds
+
+```sh
+freed sync
+```
