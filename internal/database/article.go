@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -50,7 +49,6 @@ func InsertMultipleArticles(articles []Article) error {
 	defer stmt.Close()
 
 	for _, article := range articles {
-		fmt.Printf("article %+v", article)
 		_, err := stmt.Exec(article.Name, article.Url, article.ReadAt, article.FeedId)
 		if err != nil {
 			return err
