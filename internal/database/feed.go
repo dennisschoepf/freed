@@ -1,10 +1,14 @@
 package database
 
+import "time"
+
 type FeedType string
 
 type Feed struct {
-	Name string
-	Url  string
+	Name         string
+	Url          string
+	AddedAt      *time.Time
+	LastSyncedAt *time.Time
 }
 
 func (f Feed) Insert() (int64, error) {

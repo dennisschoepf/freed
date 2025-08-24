@@ -3,7 +3,7 @@ CREATE table article (
   id INTEGER PRIMARY KEY,
   name text NOT NULL,
   url text NOT NULL UNIQUE,
-  readAt text,
+  readAt DATETIME,
   feedId INTEGER,
   FOREIGN KEY (feedId) REFERENCES feed(id)
 );
