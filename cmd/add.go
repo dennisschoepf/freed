@@ -18,7 +18,7 @@ package cmd
 
 import (
 	"fmt"
-	feed "freed/internal"
+	"freed/internal"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -35,7 +35,7 @@ Supported types currently are:
 - RSS
 - Youtube Channel links`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := feed.Add(args[0]); err != nil {
+		if err := internal.AddFeed(args[0]); err != nil {
 			// TODO: Prettify this/all errors
 			fmt.Printf("Error adding feed: %v\n", err)
 			os.Exit(1)

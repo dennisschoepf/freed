@@ -1,4 +1,4 @@
-package feed
+package internal
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-func Add(feedUrl string) error {
+func AddFeed(feedUrl string) error {
 	if _, err := url.ParseRequestURI(feedUrl); err != nil {
 		return fmt.Errorf("The given URL does not seem to be valid: %s", err)
 	}
@@ -19,27 +19,39 @@ func Add(feedUrl string) error {
 		return err
 	}
 
-	fmt.Printf("feed: %+v", feed)
-
-	// TODO: I have everything here (feed), might as well store it right away
-	// So, implement a loop to do that here
-
 	f := database.Feed{
 		Name: feed.Title,
 		Url:  feedUrl,
 	}
 
-	if _, err := f.Insert(); err != nil {
+	feedId, err := f.Insert()
+	if err != nil {
 		return err
 	}
+
+	articles := make([]database.Article, 0, 10)
+
+	for i, v := range feed.Items {
+		if i < 10 {
+			a := database.Article{
+				Name:   v.Title,
+				Url:    v.Link,
+				FeedId: feedId,
+			}
+
+			articles = append(articles, a)
+		}
+	}
+
+	database.InsertMultipleArticles(articles)
 
 	return nil
 }
 
 func parseByUrl(u string) (*gofeed.Feed, error) {
 	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL(u)
 
+	feed, err := fp.ParseURL(u)
 	if err != nil {
 		return nil, err
 	}
