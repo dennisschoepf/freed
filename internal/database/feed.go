@@ -35,8 +35,36 @@ func (f Feed) Insert() (int64, error) {
 	return id, nil
 }
 
+// This might be a problem if we have a LOT of feeds configured
+// as of now this works, so it is not at the top of the priority
+// list
+func FindAllFeeds() (*[]Feed, error) {
+	rows, err := db.Query("SELECT id, name, url, createdAt, lastSyncedAt FROM feed")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var feeds []Feed
+
+	for rows.Next() {
+		var feed Feed
+		err := rows.Scan(&feed.ID, &feed.Name, &feed.Url, &feed.CreatedAt, &feed.LastSyncedAt)
+		if err != nil {
+			return nil, err
+		}
+		feeds = append(feeds, feed)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &feeds, nil
+}
+
 func FindAllFeedsWithArticleCount() (*[]FeedWithArticleCount, error) {
-	rows, err := db.Query("SELECT f.id, f.name, f.url, f.createdAt, f.lastSyncedAt, COUNT(a.id) FROM feed as f LEFT JOIN article as a ON a.feedId = f.id;")
+	rows, err := db.Query("SELECT f.id, f.name, f.url, f.createdAt, f.lastSyncedAt, COUNT(a.id) FROM feed as f LEFT JOIN article as a ON a.feedId = f.id")
 	if err != nil {
 		return nil, err
 	}

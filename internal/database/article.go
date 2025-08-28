@@ -12,6 +12,10 @@ type Article struct {
 	FeedId int64
 }
 
+type InsertMultipleOptions struct {
+	IgnoreDuplicates bool
+}
+
 func (a Article) Insert() (int64, error) {
 	result, err := db.Exec("INSERT INTO article (name, url, readAt, feedId) VALUES (?, ?, ?, ?)", a.Name, a.Url, a.ReadAt, a.FeedId)
 
@@ -43,6 +47,14 @@ func (a Article) MarkAsRead() error {
 }
 
 func InsertMultipleArticles(articles []Article) error {
+	return insertMultipleArticlesWithOpts(articles, InsertMultipleOptions{IgnoreDuplicates: false})
+}
+
+func InsertIgnoreMultipleArticles(articles []Article) error {
+	return insertMultipleArticlesWithOpts(articles, InsertMultipleOptions{IgnoreDuplicates: true})
+}
+
+func insertMultipleArticlesWithOpts(articles []Article, opts InsertMultipleOptions) error {
 	if len(articles) == 0 {
 		return nil
 	}
@@ -55,7 +67,15 @@ func InsertMultipleArticles(articles []Article) error {
 
 	defer tx.Rollback()
 
-	stmt, err := tx.Prepare("INSERT INTO article (name, url, readAt, feedId) VALUES (?, ?, ?, ?)")
+	insertStmt := "INSERT "
+
+	if opts.IgnoreDuplicates {
+		insertStmt = insertStmt + "OR IGNORE "
+	}
+
+	finalStmt := insertStmt + "INTO article (name, url, readAt, feedId) VALUES (?, ?, ?, ?)"
+
+	stmt, err := tx.Prepare(finalStmt)
 
 	if err != nil {
 		return err
