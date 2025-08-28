@@ -5,6 +5,7 @@ import (
 )
 
 type Article struct {
+	ID     string
 	Name   string
 	Url    string
 	ReadAt *time.Time
@@ -25,6 +26,20 @@ func (a Article) Insert() (int64, error) {
 	}
 
 	return id, nil
+}
+
+func (a Article) MarkAsRead() error {
+	result, err := db.Exec("UPDATE article SET readAt = datetime() WHERE id = ?;", a.ID)
+
+	if err != nil {
+		return err
+	}
+
+	if _, err := result.RowsAffected(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func InsertMultipleArticles(articles []Article) error {
@@ -56,4 +71,30 @@ func InsertMultipleArticles(articles []Article) error {
 	}
 
 	return tx.Commit()
+}
+
+func FindOneUnreadArticle() (*Article, error) {
+	var article Article
+
+	row := db.QueryRow("SELECT * FROM article WHERE readAt IS NULL ORDER BY RANDOM() LIMIT 1")
+	err := row.Scan(&article.ID, &article.Name, &article.Url, &article.ReadAt, &article.FeedId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &article, nil
+}
+
+func CountArticlesReadToday() (int, error) {
+	var count int
+
+	result := db.QueryRow("SELECT COUNT(*) FROM article WHERE date(readAt) = date()")
+	err := result.Scan(&count)
+
+	if err != nil {
+		return -1, err
+	}
+
+	return count, nil
 }

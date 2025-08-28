@@ -25,7 +25,7 @@ freed add "https://feed.url"
 Lists all currently stored feed with their metadata.
 
 ```sh
-freed ls
+freed list # or `freed ls`
 ```
 
 ### Show a feed entry for the day

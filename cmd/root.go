@@ -46,11 +46,11 @@ var (
 		Short: "A f[r]eed aggregator with an intentionally reduced discovery mechanism.",
 		Long: `A f[r]eed aggregator with an intentionally reduced discovery mechanism.
 
-f[r]eed aims to handle all sort of different inputs that emit recurring content. This includes: RSS feeds, youtube channels, and more. If there is a type of input that you wish to be handled (or you find a bug), open an issue at https://github.com/dennisschoepf/freed/issues.
+f[r]eed aims to handle all sort of different inputs that emit recurring content. This includes: RSS feeds, youtube channels, and more. If there is a type of input that you wish to be handled (or you find a bug), file a issue at https://github.com/dennisschoepf/freed/issues.
 
 Where f[r]eed is different to other feed aggregators or bookmarking services is in its discovery mechanism. Due to the overwhelming amount of content created every day, the constant stream of input can be overwhelming. That is why only a set amount of new content from your input feeds is shown to you when discovering new items. The amount is going to be configurable in the future.
 
-The application also includes a set of recommended "Small Web" and topic-specific curated feeds. These are also available through the configuration.
+The application will also include a set of recommended "Small Web" and topic-specific curated feeds.
 	`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			initDB()

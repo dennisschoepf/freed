@@ -1,5 +1,5 @@
 /*
-Copyright © 2024 Dennis Schoepf <dev@dnsc.io>
+Copyright © 2025 Dennis Schoepf <dev@dnsc.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,26 +17,42 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
-	"fmt"
+	"freed/internal"
 
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
 // todayCmd represents the today command
 var todayCmd = &cobra.Command{
-	Use:   "today",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:     "today",
+	Aliases: []string{"day", "t"},
+	Short:   "Shows an item for the day",
+	Long:    `Shows an item from your stored feeds. Only allows for a set amount of items to be read in a day to discourage doom-scrolling.`,
+	Example: `freed today`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("today called")
+		url, err := internal.GetArticleUrlForToday()
+
+		if err != nil {
+			pterm.Error.Printf("Could not get article for today: %v\n", err)
+			return
+		}
+
+		title := pterm.LightCyan("Today's article")
+		pterm.DefaultBox.WithPadding(2).WithTitle(title).Println(url)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(todayCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// todayCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// todayCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
