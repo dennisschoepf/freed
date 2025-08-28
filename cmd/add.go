@@ -17,10 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
-	"fmt"
 	"freed/internal"
-	"os"
 
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -35,11 +34,14 @@ Supported types currently are:
 - RSS
 - Youtube Channel links`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := internal.AddFeed(args[0]); err != nil {
-			// TODO: Prettify this/all errors
-			fmt.Printf("Error adding feed: %v\n", err)
-			os.Exit(1)
+		feedName, articlesCount, err := internal.AddFeed(args[0])
+
+		if err != nil {
+			pterm.Error.Printf("Error adding feed: %v\n", err)
+			return
 		}
+
+		pterm.Success.Printf("Added new feed: \"%s\" and imported %d items\n", feedName, articlesCount)
 	},
 }
 

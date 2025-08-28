@@ -8,15 +8,15 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-func AddFeed(feedUrl string) error {
+func AddFeed(feedUrl string) (string, int, error) {
 	if _, err := url.ParseRequestURI(feedUrl); err != nil {
-		return fmt.Errorf("The given URL does not seem to be valid: %s", err)
+		return "", 0, fmt.Errorf("The given URL does not seem to be valid: %s", err)
 	}
 
 	feed, err := parseByUrl(feedUrl)
 
 	if err != nil {
-		return err
+		return "", 0, err
 	}
 
 	f := database.Feed{
@@ -26,7 +26,7 @@ func AddFeed(feedUrl string) error {
 
 	feedId, err := f.Insert()
 	if err != nil {
-		return err
+		return "", 0, err
 	}
 
 	articles := make([]database.Article, 0, 10)
@@ -43,9 +43,11 @@ func AddFeed(feedUrl string) error {
 		}
 	}
 
-	database.InsertMultipleArticles(articles)
+	if err := database.InsertMultipleArticles(articles); err != nil {
+		return feed.Title, 0, nil
+	}
 
-	return nil
+	return feed.Title, len(articles), nil
 }
 
 func parseByUrl(u string) (*gofeed.Feed, error) {
