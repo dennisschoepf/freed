@@ -14,7 +14,7 @@ go install ...
 
 ### Add a RSS feed or youtube channel
 
-Currently RSS feeds, Atom feeds and Youtube channel links are supported.
+Currently only RSS and Atom feeds and are supported.
 
 ```sh
 freed add "https://feed.url"

@@ -31,8 +31,9 @@ var addCmd = &cobra.Command{
 	Long: `Validates and stores a feed in the application's database. Depending on the feed type, articles, videos, or updates are fetched right away.
 
 Supported types currently are:
-- RSS
-- Youtube Channel links`,
+- RSS feeds
+- Atom feeds
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		feedName, articlesCount, err := internal.AddFeed(args[0])
 

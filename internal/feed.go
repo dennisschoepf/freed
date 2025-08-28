@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"freed/internal/database"
 	"net/url"
+	"strconv"
 
 	"github.com/mmcdole/gofeed"
+	"github.com/pterm/pterm"
 )
 
 func AddFeed(feedUrl string) (string, int, error) {
@@ -48,6 +50,34 @@ func AddFeed(feedUrl string) (string, int, error) {
 	}
 
 	return feed.Title, len(articles), nil
+}
+
+func GetAllFeedsAsTable() (pterm.TableData, error) {
+	feeds, err := database.FindAllFeedsWithArticleCount()
+
+	if err != nil {
+		return nil, err
+	}
+
+	tableData := pterm.TableData{}
+	headerRow := []string{"ID", "Name", "Url", "Item Count", "Created At", "Last Synced At"}
+
+	tableData = append(tableData, headerRow)
+
+	for _, feed := range *feeds {
+		rowData := []string{
+			fmt.Sprintf("[%d]", feed.ID),
+			feed.Name,
+			feed.Url,
+			strconv.Itoa(feed.ArticleCount),
+			pterm.Gray(feed.CreatedAt),
+			pterm.Gray(feed.LastSyncedAt),
+		}
+
+		tableData = append(tableData, rowData)
+	}
+
+	return tableData, nil
 }
 
 func parseByUrl(u string) (*gofeed.Feed, error) {
