@@ -30,12 +30,19 @@ var addCmd = &cobra.Command{
 	Short: "Adds a new feed to the application.",
 	Long: `Validates and stores a feed in the application's database. Depending on the feed type, articles, videos, or updates are fetched right away.
 
+The number of articles that are imported initially can be set with the --last flag. If it is not provided the last 10 items are imported.
+
 Supported types currently are:
 - RSS feeds
 - Atom feeds
 `,
+	Example: `freed add "..."
+freed add "..." --last 50 <- Imports the last 50 items in the feed`,
 	Run: func(cmd *cobra.Command, args []string) {
-		feedName, articlesCount, err := internal.AddFeed(args[0])
+		addRecentCount := 10
+		addRecentCount, _ = cmd.Flags().GetInt("last")
+
+		feedName, articlesCount, err := internal.AddFeed(args[0], addRecentCount)
 
 		if err != nil {
 			pterm.Error.Printf("Error adding feed: %v\n", err)

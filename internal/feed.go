@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"freed/internal/database"
 	"net/url"
-	"strconv"
 	"sync"
 	"time"
 
 	"github.com/mmcdole/gofeed"
-	"github.com/pterm/pterm"
 )
 
 type Feed struct {
@@ -21,7 +19,7 @@ type Feed struct {
 	ArticleCount int
 }
 
-func AddFeed(feedUrl string) (string, int, error) {
+func AddFeed(feedUrl string, addRecentCount int) (string, int, error) {
 	if _, err := url.ParseRequestURI(feedUrl); err != nil {
 		return "", 0, fmt.Errorf("The given URL does not seem to be valid: %s", err)
 	}
@@ -42,11 +40,10 @@ func AddFeed(feedUrl string) (string, int, error) {
 		return "", 0, err
 	}
 
-	// TODO: Make the amount of articles configurable
-	articles := make([]database.ArticleEntity, 0, 10)
+	articles := make([]database.ArticleEntity, 0, addRecentCount)
 
 	for i, v := range feed.Items {
-		if i > 10 {
+		if i > addRecentCount {
 			continue
 		}
 
