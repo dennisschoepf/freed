@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type Article struct {
+type ArticleEntity struct {
 	ID     string
 	Name   string
 	Url    string
@@ -16,7 +16,7 @@ type InsertMultipleOptions struct {
 	IgnoreDuplicates bool
 }
 
-func (a Article) Insert() (int64, error) {
+func (a ArticleEntity) Insert() (int64, error) {
 	result, err := db.Exec("INSERT INTO article (name, url, readAt, feedId) VALUES (?, ?, ?, ?)", a.Name, a.Url, a.ReadAt, a.FeedId)
 
 	if err != nil {
@@ -32,7 +32,7 @@ func (a Article) Insert() (int64, error) {
 	return id, nil
 }
 
-func (a Article) MarkAsRead() error {
+func (a ArticleEntity) MarkAsRead() error {
 	result, err := db.Exec("UPDATE article SET readAt = datetime() WHERE id = ?;", a.ID)
 
 	if err != nil {
@@ -46,15 +46,15 @@ func (a Article) MarkAsRead() error {
 	return nil
 }
 
-func InsertMultipleArticles(articles []Article) error {
+func InsertMultipleArticles(articles []ArticleEntity) error {
 	return insertMultipleArticlesWithOpts(articles, InsertMultipleOptions{IgnoreDuplicates: false})
 }
 
-func InsertIgnoreMultipleArticles(articles []Article) error {
+func InsertIgnoreMultipleArticles(articles []ArticleEntity) error {
 	return insertMultipleArticlesWithOpts(articles, InsertMultipleOptions{IgnoreDuplicates: true})
 }
 
-func insertMultipleArticlesWithOpts(articles []Article, opts InsertMultipleOptions) error {
+func insertMultipleArticlesWithOpts(articles []ArticleEntity, opts InsertMultipleOptions) error {
 	if len(articles) == 0 {
 		return nil
 	}
@@ -93,8 +93,8 @@ func insertMultipleArticlesWithOpts(articles []Article, opts InsertMultipleOptio
 	return tx.Commit()
 }
 
-func FindOneUnreadArticle() (*Article, error) {
-	var article Article
+func FindOneUnreadArticle() (*ArticleEntity, error) {
+	var article ArticleEntity
 
 	row := db.QueryRow("SELECT * FROM article WHERE readAt IS NULL ORDER BY RANDOM() LIMIT 1")
 	err := row.Scan(&article.ID, &article.Name, &article.Url, &article.ReadAt, &article.FeedId)

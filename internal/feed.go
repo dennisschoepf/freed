@@ -34,14 +34,14 @@ func AddFeed(feedUrl string) (string, int, error) {
 	}
 
 	// TODO: Make the amount of articles configurable
-	articles := make([]database.Article, 0, 10)
+	articles := make([]database.ArticleEntity, 0, 10)
 
 	for i, v := range feed.Items {
 		if i > 10 {
 			continue
 		}
 
-		a := database.Article{
+		a := database.ArticleEntity{
 			Name:   v.Title,
 			Url:    v.Link,
 			FeedId: feedId,
@@ -143,14 +143,14 @@ func syncFeed(
 		return
 	}
 
-	var articles []database.Article
+	var articles []database.ArticleEntity
 
 	for _, item := range gFeed.Items {
 		if item.PublishedParsed.Before(*feed.LastSyncedAt) {
 			continue
 		}
 
-		article := database.Article{
+		article := database.ArticleEntity{
 			Name:   item.Title,
 			Url:    item.Link,
 			FeedId: feed.ID,

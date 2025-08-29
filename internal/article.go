@@ -2,29 +2,50 @@ package internal
 
 import (
 	"fmt"
+	"time"
+
 	"freed/internal/database"
 )
 
-func GetArticleUrlForToday() (string, error) {
+type Article struct {
+	ID     string
+	Name   string
+	Url    string
+	ReadAt *time.Time
+	FeedId int64
+}
+
+func GetArticleUrlForToday() (*Article, error) {
 	count, err := database.CountArticlesReadToday()
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if count > 0 {
-		return "", fmt.Errorf("Already reached maximum number of articles for the day. Come back tomorrow!")
+		return nil, fmt.Errorf("Already reached maximum number of articles for the day. Come back tomorrow!")
 	}
 
-	article, err := database.FindOneUnreadArticle()
+	articleEntity, err := database.FindOneUnreadArticle()
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	if err := article.MarkAsRead(); err != nil {
-		return "", err
+	// For now doing it at this point is enough
+	// In the future it might be better to gather user input
+	// on if the article was read
+	if err := articleEntity.MarkAsRead(); err != nil {
+		return nil, err
 	}
 
-	return article.Url, nil
+	article := &Article{
+		ID:     articleEntity.ID,
+		Name:   articleEntity.Name,
+		Url:    articleEntity.Url,
+		ReadAt: articleEntity.ReadAt,
+		FeedId: articleEntity.FeedId,
+	}
+
+	return article, nil
 }
