@@ -23,7 +23,7 @@ func AddFeed(feedUrl string) (string, int, error) {
 		return "", 0, err
 	}
 
-	f := database.Feed{
+	f := database.FeedEntity{
 		Name: feed.Title,
 		Url:  feedUrl,
 	}
@@ -125,7 +125,7 @@ func SyncFeeds() error {
 }
 
 func syncFeed(
-	feed database.Feed,
+	feed database.FeedEntity,
 	syncBefore time.Time,
 	wg *sync.WaitGroup,
 	errorChannel chan<- error,
