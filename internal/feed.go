@@ -12,6 +12,15 @@ import (
 	"github.com/pterm/pterm"
 )
 
+type Feed struct {
+	ID           int64
+	Name         string
+	Url          string
+	CreatedAt    *time.Time
+	LastSyncedAt *time.Time
+	ArticleCount int
+}
+
 func AddFeed(feedUrl string) (string, int, error) {
 	if _, err := url.ParseRequestURI(feedUrl); err != nil {
 		return "", 0, fmt.Errorf("The given URL does not seem to be valid: %s", err)
@@ -57,32 +66,29 @@ func AddFeed(feedUrl string) (string, int, error) {
 	return feed.Title, len(articles), nil
 }
 
-func GetAllFeedsAsTable() (pterm.TableData, error) {
-	feeds, err := database.FindAllFeedsWithArticleCount()
+func GetAllFeeds() (*[]Feed, error) {
+	feedEntities, err := database.FindAllFeedsWithArticleCount()
 
 	if err != nil {
 		return nil, err
 	}
 
-	tableData := pterm.TableData{}
-	headerRow := []string{"ID", "Name", "Url", "Item Count", "Created At", "Last Synced At"}
+	var feeds []Feed
 
-	tableData = append(tableData, headerRow)
-
-	for _, feed := range *feeds {
-		rowData := []string{
-			fmt.Sprintf("[%d]", feed.ID),
-			feed.Name,
-			feed.Url,
-			strconv.Itoa(feed.ArticleCount),
-			pterm.Gray(feed.CreatedAt),
-			pterm.Gray(feed.LastSyncedAt),
+	for _, feedEntity := range *feedEntities {
+		feed := &Feed{
+			ID:           feedEntity.ID,
+			Name:         feedEntity.Name,
+			Url:          feedEntity.Url,
+			CreatedAt:    feedEntity.CreatedAt,
+			LastSyncedAt: feedEntity.LastSyncedAt,
+			ArticleCount: feedEntity.ArticleCount,
 		}
 
-		tableData = append(tableData, rowData)
+		feeds = append(feeds, *feed)
 	}
 
-	return tableData, nil
+	return &feeds, nil
 }
 
 func SyncFeeds() error {

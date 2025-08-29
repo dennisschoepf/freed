@@ -17,7 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
+	"fmt"
 	"freed/internal"
+	"strconv"
 
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
@@ -32,7 +34,14 @@ var listCmd = &cobra.Command{
 	Example: `freed list
 freed ls`,
 	Run: func(cmd *cobra.Command, args []string) {
-		tableData, err := internal.GetAllFeedsAsTable()
+		feeds, err := internal.GetAllFeeds()
+
+		if err != nil {
+			pterm.Error.Printf("Error getting feeds: %v\n", err)
+			return
+		}
+
+		tableData, err := mapFeedsToPtermTable(*feeds)
 
 		if err != nil {
 			pterm.Error.Printf("Error listing feeds: %v\n", err)
@@ -55,4 +64,26 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func mapFeedsToPtermTable(feeds []internal.Feed) (pterm.TableData, error) {
+	tableData := pterm.TableData{}
+	headerRow := []string{"ID", "Name", "Url", "Item Count", "Created At", "Last Synced At"}
+
+	tableData = append(tableData, headerRow)
+
+	for _, feed := range feeds {
+		rowData := []string{
+			fmt.Sprintf("[%d]", feed.ID),
+			feed.Name,
+			feed.Url,
+			strconv.Itoa(feed.ArticleCount),
+			pterm.Gray(feed.CreatedAt),
+			pterm.Gray(feed.LastSyncedAt),
+		}
+
+		tableData = append(tableData, rowData)
+	}
+
+	return tableData, nil
 }
